@@ -16,6 +16,78 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inject Custom CSS for Premium Design
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    html, body, [class*="css"]  {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Main App Background */
+    .stApp {
+        background: linear-gradient(135deg, #1e1e2f 0%, #151520 100%);
+        color: #f0f0f0;
+    }
+    
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: rgba(30, 30, 45, 0.6);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Primary Button styling */
+    .stButton>button[kind="primary"] {
+        background: linear-gradient(90deg, #ff7eb3, #ff758c) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4) !important;
+        transition: all 0.3s ease !important;
+        font-weight: 600 !important;
+    }
+    .stButton>button[kind="primary"]:hover {
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 6px 20px rgba(255, 117, 140, 0.6) !important;
+    }
+    
+    /* Secondary Button styling */
+    .stButton>button[kind="secondary"] {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #e0e0e0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton>button[kind="secondary"]:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    /* Inputs */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+    }
+    .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
+        border-color: #ff758c !important;
+        box-shadow: 0 0 0 1px #ff758c !important;
+    }
+    
+    /* Headers */
+    h1, h2, h3 {
+        background: -webkit-linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize Session State variables if they don't exist
 if "history" not in st.session_state:
     st.session_state.history = []
