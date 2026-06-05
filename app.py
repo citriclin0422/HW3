@@ -27,15 +27,15 @@ st.markdown("""
     
     /* Main App Background */
     .stApp {
-        background: linear-gradient(135deg, #1e1e2f 0%, #151520 100%);
-        color: #f0f0f0;
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        color: #1a1a1a;
     }
     
     /* Sidebar styling */
     [data-testid="stSidebar"] {
-        background-color: rgba(30, 30, 45, 0.6);
+        background-color: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
     
     /* Primary Button styling */
@@ -55,32 +55,32 @@ st.markdown("""
     
     /* Secondary Button styling */
     .stButton>button[kind="secondary"] {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #e0e0e0 !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(0, 0, 0, 0.05) !important;
+        color: #1a1a1a !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
         border-radius: 8px !important;
         transition: all 0.3s ease !important;
     }
     .stButton>button[kind="secondary"]:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
+        background: rgba(0, 0, 0, 0.1) !important;
         transform: translateY(-1px) !important;
     }
     
     /* Inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        color: #000000 !important;
+        border: 1px solid rgba(0, 0, 0, 0.15) !important;
         border-radius: 8px !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #ff758c !important;
-        box-shadow: 0 0 0 1px #ff758c !important;
+        border-color: #0052cc !important;
+        box-shadow: 0 0 0 1px #0052cc !important;
     }
     
     /* Headers */
     h1, h2, h3 {
-        background: -webkit-linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        background: -webkit-linear-gradient(45deg, #09203f 0%, #537895 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
@@ -100,12 +100,12 @@ with st.sidebar:
     
     engine = st.radio(
         "選擇生成模型:",
-        options=["cosmos3", "gemini", "bing"],
-        format_func=lambda x: "Cosmos 3 Super (64B) [HF]" if x == "cosmos3" else "Imagen 4.0 [Google]" if x == "gemini" else "Bing Image Creator [Microsoft 免費]"
+        options=["cosmos3", "flux", "gemini", "bing"],
+        format_func=lambda x: "Cosmos 3 Super (64B) [HF]" if x == "cosmos3" else "FLUX.1-schnell [HF]" if x == "flux" else "Imagen 4.0 [Google]" if x == "gemini" else "Bing Image Creator [Microsoft 免費]"
     )
     
     hf_token = ""
-    if engine == "cosmos3":
+    if engine in ["cosmos3", "flux"]:
         st.markdown("### Hugging Face 設定")
         hf_token = st.text_input(
             "Hugging Face Token", 
@@ -113,7 +113,7 @@ with st.sidebar:
             help="Your token is kept secure and only used for the HF inference API."
         )
         if not hf_token:
-            st.warning("⚠️ 請輸入 Hugging Face Token 以使用 Cosmos 3 模型。")
+            st.warning("⚠️ 請輸入 Hugging Face Token 以使用 Hugging Face 模型。")
         else:
             st.success("✅ Token 已配置")
             
@@ -254,7 +254,7 @@ if st.button("▶️ 開始生成", type="primary", use_container_width=True):
                     
                     try:
                         response = requests.post(
-                            "https://api-inference.huggingface.co/models/nvidia/Cosmos3-Super-Text2Image",
+                            "https://router.huggingface.co/hf-inference/models/nvidia/Cosmos3-Super-Text2Image",
                             headers={
                                 "Authorization": f"Bearer {hf_token.strip()}",
                                 "Content-Type": "application/json"
@@ -274,6 +274,57 @@ if st.button("▶️ 開始生成", type="primary", use_container_width=True):
                                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
                             })
                             st.success("🎨 Cosmos 3 圖像生成成功！")
+                        else:
+                            st.error(f"Hugging Face 回傳錯誤 (HTTP {response.status_code}): {response.text}")
+                    except Exception as e:
+                        st.error(f"發生錯誤: {str(e)}")
+                        
+        # FLUX.1-schnell (Hugging Face)
+        elif engine == "flux":
+            if not hf_token.strip():
+                st.error("請先在左側設定 Hugging Face Token！")
+            else:
+                with st.spinner("正在呼叫 Hugging Face 推理伺服器..."):
+                    width, height = 1024, 1024
+                    if aspect_ratio == "16:9":
+                        width, height = 1024, 576
+                    elif aspect_ratio == "9:16":
+                        width, height = 576, 1024
+                        
+                    hf_payload = {
+                        "inputs": user_prompt,
+                        "parameters": {
+                            "negative_prompt": negative_prompt,
+                            "guidance_scale": guidance_scale,
+                            "num_inference_steps": inference_steps,
+                            "width": width,
+                            "height": height,
+                            "seed": seed if seed != -1 else int(time.time())
+                        }
+                    }
+                    
+                    try:
+                        response = requests.post(
+                            "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+                            headers={
+                                "Authorization": f"Bearer {hf_token.strip()}",
+                                "Content-Type": "application/json"
+                            },
+                            json=hf_payload,
+                            timeout=60
+                        )
+                        
+                        if response.status_code == 200:
+                            image_bytes = response.content
+                            st.session_state.history.insert(0, {
+                                "id": f"gen-{int(time.time())}",
+                                "prompt": user_prompt,
+                                "engine": "FLUX.1-schnell",
+                                "aspect_ratio": aspect_ratio,
+                                "image_bytes": image_bytes,
+                                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                            })
+                            st.success("🎨 FLUX.1-schnell 圖像生成成功！")
                         else:
                             st.error(f"Hugging Face 回傳錯誤 (HTTP {response.status_code}): {response.text}")
                     except Exception as e:

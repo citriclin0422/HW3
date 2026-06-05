@@ -50,6 +50,11 @@ streamlit run app.py
 4. 點擊 **「✨ AI 擴寫 (Gemini 優化)」** 讓 AI 幫您完善提示詞。
 5. 點擊 **「▶️ 開始生成」**，稍候片刻即可在下方查看並下載您的作品！
 
+### ⚠️ Hugging Face API 端點更新注意事項
+Hugging Face 官方已將舊的 `api-inference.huggingface.co` 伺服器棄用並關閉。本專案已同步更新為官方最新的 Inference Providers Router 網址：
+`https://router.huggingface.co/hf-inference/models/{model_id}`
+若您在其他專案遇到 `Name or service not known` 錯誤，請確保已將 API 網址更新為上述新格式。
+
 ## 🛠 技術堆疊
 
 - **前端與框架**：[Streamlit](https://streamlit.io/)
