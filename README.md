@@ -1,5 +1,7 @@
 # 🎨 Cosmos 3 AI Image Studio (AI 創意繪圖板)
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://260605hw3.streamlit.app/)
+
 這是一個基於 Streamlit 開發的 AI 圖像生成應用程式（學生創新專題：高真物理影像生成學堂）。本專案支援使用高畫質物理圖像生成模型 **NVIDIA Cosmos 3** 以及 **Google Imagen 4.0** 進行影像創作，並整合了 Gemini AI 提供自動提示詞 (Prompt) 擴寫優化的功能。
 
 ## ✨ 特色功能
