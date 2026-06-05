@@ -100,8 +100,8 @@ with st.sidebar:
     
     engine = st.radio(
         "選擇生成模型:",
-        options=["cosmos3", "gemini"],
-        format_func=lambda x: "Cosmos 3 Super (64B) [HF]" if x == "cosmos3" else "Imagen 4.0 [Google]"
+        options=["cosmos3", "gemini", "bing"],
+        format_func=lambda x: "Cosmos 3 Super (64B) [HF]" if x == "cosmos3" else "Imagen 4.0 [Google]" if x == "gemini" else "Bing Image Creator [Microsoft 免費]"
     )
     
     hf_token = ""
@@ -147,8 +147,11 @@ with st.sidebar:
             value="blurry, low quality, distorted, bad physics, text, watermark"
         )
         
-    else:
+    elif engine == "gemini":
         st.info("ℹ️ Gemini 內建沙盒引擎運作中。本應用已安全對接 Imagen 4.0，無需額外 Token 即可體驗。")
+    elif engine == "bing":
+        st.info("ℹ️ 微軟 Bing Image Creator (DALL-E 3) 是免費的生圖工具。")
+        st.markdown("[👉 點此前往 Bing Image Creator 進行生成](https://www.bing.com/images/create)")
 
 # Main Content
 st.title("🎨 Cosmos 3 AI 創意繪圖板")
@@ -317,6 +320,12 @@ if st.button("▶️ 開始生成", type="primary", use_container_width=True):
                             st.error(f"Google API 回傳錯誤 (HTTP {response.status_code}): {response.text}")
                     except Exception as e:
                         st.error(f"發生錯誤: {str(e)}")
+                        
+        # Bing Image Creator
+        elif engine == "bing":
+            st.success("✨ 已為您準備好提示詞！")
+            st.info("請複製下方提示詞，並點擊左側面板的連結前往 Bing 網站免費生成。")
+            st.code(user_prompt, language="text")
 
 # Display Generated Images History
 if st.session_state.history:
